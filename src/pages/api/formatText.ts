@@ -12,8 +12,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
             // const prompt = `Paraphrase and format the following text by making it sound ${vibe.trim()} and as human-sounding as possible. Answer should be no more than 500 words; if the original text is less than 500 words try to maintain the text lenght. This is the text: ${context.trim()}`
             const prompt = `Summarize and make the following text sound ${vibe.trim()}: ${context.trim()}`;
 
-            console.log(prompt);
-
             fetch("https://api.openai.com/v1/completions", {
                 method: 'POST',
                 headers: {
@@ -29,7 +27,13 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
                     "max_tokens": 1800
                 })
             })
-            .then(res => res.json())
+            .then(response => {
+                if(response.status === 200) {
+                    return response.json();
+                } else {
+                    throw new Error("Request failed with status code " + response.status);
+                }
+            })
             .then(data => {
                 res.status(200).json(data);
             })
